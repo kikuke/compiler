@@ -4,6 +4,7 @@
 #include <ctype.h>
 
 #define MAX_BUFFER_SIZE 2048
+#define PROMPT "CALCULATOR> "
 #define EXIT_INPUT "exit\n"
 
 typedef enum {
@@ -52,6 +53,7 @@ void main() {
     //Todo: 주석처리 하고 차례차례 테스트해보기
     CAL_STRUCT result;
 
+    printf("%s", PROMPT);
     while (strcmp(fgets(buffer, MAX_BUFFER_SIZE, stdin), EXIT_INPUT)) {
         rewind_buffer();
 
@@ -60,15 +62,17 @@ void main() {
         if (now_token != END)
             print_error("END");
         else {
-            if (now_num.type == INT) {
-                printf("RESULT: %i\n", now_num.val.i);
-            } else if (now_num.type == FLT) {
-                printf("RESULT: %f\n", now_num.val.f);
+            if (result.type == INT) {
+                printf("RESULT: %i\n", result.val.i);
+            } else if (result.type == FLT) {
+                printf("RESULT: %f\n", result.val.f);
             } else {
                 fputs("Undefined CAL_TYPE", stderr);
                 exit(1);
             }
         }
+
+        printf("%s", PROMPT);
     }
 
     exit(0);
@@ -131,7 +135,7 @@ void CAL_STRUCT_calculator(CAL_STRUCT *target, const CAL_STRUCT *source, TOKEN o
     
     switch (op)
     {
-    case '+':
+    case PLUS:
         if (target->type == INT) {
             if (source->type == INT)
                 target->val.i += source->val.i;
@@ -145,7 +149,7 @@ void CAL_STRUCT_calculator(CAL_STRUCT *target, const CAL_STRUCT *source, TOKEN o
         }
         break;
 
-    case '-':
+    case MINUS:
         if (target->type == INT) {
             if (source->type == INT)
                 target->val.i -= source->val.i;
@@ -159,7 +163,7 @@ void CAL_STRUCT_calculator(CAL_STRUCT *target, const CAL_STRUCT *source, TOKEN o
         }
         break;
 
-    case '*':
+    case STAR:
         if (target->type == INT) {
             if (source->type == INT)
                 target->val.i *= source->val.i;
@@ -173,7 +177,7 @@ void CAL_STRUCT_calculator(CAL_STRUCT *target, const CAL_STRUCT *source, TOKEN o
         }
         break;
 
-    case '/':
+    case DIVIDE:
         if (target->type == INT) {
             if (source->type == INT)
                 target->val.i /= source->val.i;
@@ -194,19 +198,17 @@ void CAL_STRUCT_calculator(CAL_STRUCT *target, const CAL_STRUCT *source, TOKEN o
 }
 
 void get_token() {
-    static char ch  = ' ';
+    char ch;
     token_s_idx = buf_idx;
 
-    if (buf_idx == 0)
-        ch = ' ';
-
+    ch = buffer[buf_idx];
     while (ch == ' ' || ch == '\t')
-        ch = buffer[buf_idx++];
+        ch = buffer[++buf_idx];
 
     if (isdigit(ch)) {
         // 숫자 파싱
         while (isdigit(ch))
-            ch = buffer[buf_idx++];
+            ch = buffer[++buf_idx];
         
         if (ch == '.') {
             // 소수인 경우
@@ -219,6 +221,7 @@ void get_token() {
         }
 
         now_token = NUMBER;
+        return;
     } else if (ch == '+')
         now_token = PLUS;
     else if (ch == '-')
@@ -237,6 +240,8 @@ void get_token() {
         now_token = ERROR;
         print_error("PLUS | MINUS | STAR | DIVIDE | NUMBER | LPAREN | RPAREN");
     }
+
+    buf_idx++;
 }
 
 void set_now_num_int(size_t s_idx, size_t e_idx) {
