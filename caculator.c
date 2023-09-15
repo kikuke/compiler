@@ -55,6 +55,11 @@ void main() {
 
     printf("%s", PROMPT);
     while (strcmp(fgets(buffer, MAX_BUFFER_SIZE, stdin), EXIT_INPUT)) {
+        if (!strcmp(buffer, "\n")) {
+            printf("%s", PROMPT);
+            continue;
+        }
+
         rewind_buffer();
 
         get_token();
@@ -215,7 +220,7 @@ void get_token() {
             do
                 ch = buffer[++buf_idx];
             while (isdigit(ch));
-            
+
             set_now_num_float(token_s_idx, buf_idx);
         } else {
             // 정수인 경우
