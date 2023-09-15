@@ -212,8 +212,10 @@ void get_token() {
         
         if (ch == '.') {
             // 소수인 경우
-            while (isdigit(ch))
-                ch = buffer[buf_idx++];
+            do
+                ch = buffer[++buf_idx];
+            while (isdigit(ch));
+            
             set_now_num_float(token_s_idx, buf_idx);
         } else {
             // 정수인 경우
