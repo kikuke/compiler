@@ -26,6 +26,8 @@ typedef union
 } CAL_VAL;
 
 typedef struct {
+    size_t s_idx;
+
     CAL_TYPE type;
     CAL_VAL val;
 } CAL_STRUCT;
@@ -47,7 +49,6 @@ CAL_STRUCT now_num;
 TOKEN now_token;
 
 size_t buf_idx;
-size_t token_s_idx;
 char buffer[MAX_BUFFER_SIZE];
 
 void main() {
@@ -216,7 +217,7 @@ void CAL_STRUCT_calculator(CAL_STRUCT *target, const CAL_STRUCT *source, TOKEN o
 
 void get_token() {
     char ch;
-    token_s_idx = buf_idx;
+    size_t token_s_idx = buf_idx;
 
     ch = buffer[buf_idx];
     while (ch == ' ' || ch == '\t')
@@ -270,6 +271,7 @@ void set_now_num_int(size_t s_idx, size_t e_idx) {
     num_buf[len] = '\0';
     num = atoi(num_buf);
 
+    now_num.s_idx = s_idx;
     now_num.type = INT;
     now_num.val.i = num;
 }
@@ -283,15 +285,24 @@ void set_now_num_float(size_t s_idx, size_t e_idx) {
     num_buf[len] = '\0';
     num = atof(num_buf);
 
+    now_num.s_idx = s_idx;
     now_num.type = FLT;
     now_num.val.f = num;
 }
 
 void print_warning(const CAL_STRUCT *lOp, const CAL_STRUCT *rOp) {
+    size_t bar_len = buf_idx - lOp->s_idx - 1;
     if (lOp->type == INT)
         printf("Warning: Left Operand Implicit Expansion\n");
     else
         printf("Warning: Right Operand Implicit Expansion\n");
+    
+    printf("    %s    ", buffer);
+    for (int i=0; i<lOp->s_idx; i++)
+        printf(" ");
+    for (int i=0; i<bar_len; i++)
+        printf("~");
+    printf("\n");
 
     if (lOp->type == INT)
         printf("    Left Operand: %d\n", lOp->val.i);
@@ -302,8 +313,6 @@ void print_warning(const CAL_STRUCT *lOp, const CAL_STRUCT *rOp) {
         printf("    Right Operand: %d\n", rOp->val.i);
     else
         printf("    Right Operand: %f\n", rOp->val.f);
-    
-    printf("    Right Operand Last Index: %lu\n", token_s_idx);
 }
 
 void print_error(char *exp_val) {
@@ -314,7 +323,7 @@ void print_error(char *exp_val) {
     printf("    ^\n");
     printf("    Now Token: %s\n", print_token[now_token]);
     printf("    Expected: < %s >\n", exp_val);
-    
+
     exit(1);
 }
 
