@@ -293,7 +293,7 @@ void print_warning(const CAL_STRUCT *lOp, const CAL_STRUCT *rOp) {
     else
         printf("    Right Operand: %f\n", rOp->val.f);
     
-    printf("    Right Operand Index: %lu\n", token_s_idx);
+    printf("    Right Operand Last Index: %lu\n", token_s_idx);
 }
 
 void print_error(char *exp_val) {
