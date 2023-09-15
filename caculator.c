@@ -71,19 +71,20 @@ void main() {
 
     exit(0);
 }
-
-/*
-
 CAL_STRUCT expression() {
     CAL_STRUCT result;
-
-    result = term();
-    while (now_token == PLUS) {
+//test
         get_token();
-        result += term();
+    //result = term();
+    while (now_token == PLUS || now_token == MINUS) {
+        get_token();
+        //result += term();
     }
     return result;
 }
+
+/*
+
 CAL_STRUCT term() {
     CAL_STRUCT result;
 
@@ -120,7 +121,7 @@ void get_token() {
     char ch  = ' ';
     size_t s_idx = buf_idx;
 
-    while (ch == ' ' || ch == '\t' || ch == '\n')
+    while (ch == ' ' || ch == '\t')
         ch = buffer[buf_idx++];
 
     if (isdigit(ch)) {
@@ -151,7 +152,7 @@ void get_token() {
         now_token = LPAREN;
     else if (ch == ')')
         now_token = RPAREN;
-    else if (ch == '\0')
+    else if (ch == '\n')
         now_token = END;
     else {
         now_token = ERROR;
