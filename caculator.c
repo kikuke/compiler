@@ -291,13 +291,28 @@ void set_now_num_float(size_t s_idx, size_t e_idx) {
 }
 
 void print_warning(const CAL_STRUCT *lOp, const CAL_STRUCT *rOp) {
+    size_t s_point_idx = 0, point_len = 0;
     size_t bar_len = buf_idx - lOp->s_idx - 1;
-    if (lOp->type == INT)
+
+    if (lOp->type == INT) {
         printf("Warning: Left Operand Implicit Expansion\n");
-    else
+        s_point_idx = lOp->s_idx;
+        point_len = rOp->s_idx - lOp->s_idx - 1;
+    }
+    else {
         printf("Warning: Right Operand Implicit Expansion\n");
+        s_point_idx = rOp->s_idx;
+        point_len = buf_idx - rOp->s_idx - 1;
+    }
     
     printf("    %s    ", buffer);
+
+    for (int i=0; i<s_point_idx; i++)
+        printf(" ");
+    for (int i=0; i<point_len; i++)
+        printf("^");
+
+    printf("\n    ");
     for (int i=0; i<lOp->s_idx; i++)
         printf(" ");
     for (int i=0; i<bar_len; i++)
