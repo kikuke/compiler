@@ -118,7 +118,7 @@ CAL_STRUCT factor() {
 */
 
 void get_token() {
-    char ch  = ' ';
+    static char ch  = ' ';
     size_t s_idx = buf_idx;
 
     while (ch == ' ' || ch == '\t')
