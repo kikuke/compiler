@@ -29,12 +29,12 @@ typedef struct {
     CAL_VAL val;
 } CAL_STRUCT;
 
-void init_buffer();
+void rewind_buffer();
 void get_token();
 CAL_STRUCT expression();
 CAL_STRUCT term();
 CAL_STRUCT factor();
-void error(char *exp_val);
+void print_error(char *exp_val);
 // s_idx는 시작주소, e_idx는 끝 바로 이후 주소
 void set_now_num_int(size_t s_idx, size_t e_idx);
 void set_now_num_float(size_t s_idx, size_t e_idx);
@@ -50,19 +50,18 @@ void main() {
     CAL_STRUCT result;
 
     while (strcmp(fgets(buffer, MAX_BUFFER_SIZE, stdin), EXIT_INPUT)) {
-        init_buffer();
+        rewind_buffer();
 
         get_token();
         result = expression();
         if (now_token != END)
-            error("END");
+            print_error("END");
         else {
             if (now_num.type == INT) {
                 printf("RESULT: %i\n", now_num.val.i);
             } else if (now_num.type == FLT) {
                 printf("RESULT: %f\n", now_num.val.f);
-            }
-            else {
+            } else {
                 fputs("Undefined CAL_TYPE", stderr);
                 exit(1);
             }
@@ -73,8 +72,7 @@ void main() {
 }
 CAL_STRUCT expression() {
     CAL_STRUCT result;
-//test
-        get_token();
+    
     //result = term();
     while (now_token == PLUS || now_token == MINUS) {
         get_token();
@@ -121,6 +119,9 @@ void get_token() {
     static char ch  = ' ';
     size_t s_idx = buf_idx;
 
+    if (buf_idx == 0)
+        ch = ' ';
+        
     while (ch == ' ' || ch == '\t')
         ch = buffer[buf_idx++];
 
@@ -156,7 +157,7 @@ void get_token() {
         now_token = END;
     else {
         now_token = ERROR;
-        error("PLUS | MINUS | STAR | DIVIDE | NUMBER | LPAREN | RPAREN");
+        print_error("PLUS | MINUS | STAR | DIVIDE | NUMBER | LPAREN | RPAREN");
     }
 }
 
@@ -187,12 +188,12 @@ void set_now_num_float(size_t s_idx, size_t e_idx) {
 }
 
 //Todo: warning 메시지 출력 함수
-void error(char *exp_val) {
+void print_error(char *exp_val) {
     printf("Syntax Error in idx: %lu - Character: %c\n", buf_idx - 1, buffer[buf_idx - 1]);
     printf("Now Token: %s\n", print_token[now_token]);
     printf("Expected: < %s >\n", exp_val);
 }
 
-void init_buffer() {
+void rewind_buffer() {
     buf_idx = 0;
 }
