@@ -34,15 +34,18 @@ void get_token();
 CAL_STRUCT expression();
 CAL_STRUCT term();
 CAL_STRUCT factor();
+void print_warning(const CAL_STRUCT *lOp, const CAL_STRUCT *rOp);
 void print_error(char *exp_val);
 // s_idx는 시작주소, e_idx는 끝 바로 이후 주소
 void set_now_num_int(size_t s_idx, size_t e_idx);
 void set_now_num_float(size_t s_idx, size_t e_idx);
+void CAL_STRUCT_calculator(CAL_STRUCT *target, const CAL_STRUCT *source, TOKEN op);
 
 CAL_STRUCT now_num;
 TOKEN now_token;
 
 size_t buf_idx;
+size_t token_s_idx;
 char buffer[MAX_BUFFER_SIZE];
 
 void main() {
@@ -70,26 +73,33 @@ void main() {
 
     exit(0);
 }
+
 CAL_STRUCT expression() {
     CAL_STRUCT result;
+    TOKEN op;
+    CAL_STRUCT rOp;
     
-    //result = term();
+    result = term();
     while (now_token == PLUS || now_token == MINUS) {
+        op = now_token;
         get_token();
-        //result += term();
+        rOp = term();
+        CAL_STRUCT_calculator(&result, &rOp, op);
     }
     return result;
 }
 
-/*
-
 CAL_STRUCT term() {
     CAL_STRUCT result;
+    TOKEN op;
+    CAL_STRUCT rOp;
 
     result = factor();
-    while (now_token == STAR) {
+    while (now_token == STAR || now_token == DIVIDE) {
+        op = now_token;
         get_token();
-        result *= factor();
+        rOp = factor();
+        CAL_STRUCT_calculator(&result, &rOp, op);
     }
     return result;
 }
@@ -107,21 +117,89 @@ CAL_STRUCT factor() {
         if (now_token == RPAREN)
             get_token();
         else
-            error();
+            print_error("RPAREN");
     }
     else
-        error();
+        print_error("NUMBER | LPAREN");
     return result;
 }
-*/
+
+void CAL_STRUCT_calculator(CAL_STRUCT *target, const CAL_STRUCT *source, TOKEN op) {
+
+    if (target->type != source->type)
+        print_warning(target, source);
+    
+    switch (op)
+    {
+    case '+':
+        if (target->type == INT) {
+            if (source->type == INT)
+                target->val.i += source->val.i;
+            else
+                target->val.i += source->val.f;
+        } else {
+            if (source->type == INT)
+                target->val.f += source->val.i;
+            else
+                target->val.f += source->val.f;
+        }
+        break;
+
+    case '-':
+        if (target->type == INT) {
+            if (source->type == INT)
+                target->val.i -= source->val.i;
+            else
+                target->val.i -= source->val.f;
+        } else {
+            if (source->type == INT)
+                target->val.f -= source->val.i;
+            else
+                target->val.f -= source->val.f;
+        }
+        break;
+
+    case '*':
+        if (target->type == INT) {
+            if (source->type == INT)
+                target->val.i *= source->val.i;
+            else
+                target->val.i *= source->val.f;
+        } else {
+            if (source->type == INT)
+                target->val.f *= source->val.i;
+            else
+                target->val.f *= source->val.f;
+        }
+        break;
+
+    case '/':
+        if (target->type == INT) {
+            if (source->type == INT)
+                target->val.i /= source->val.i;
+            else
+                target->val.i /= source->val.f;
+        } else {
+            if (source->type == INT)
+                target->val.f /= source->val.i;
+            else
+                target->val.f /= source->val.f;
+        }
+        break;
+    
+    default:
+        print_error("PLUS | MINUS | STAR | DIVIDE");
+        break;
+    }
+}
 
 void get_token() {
     static char ch  = ' ';
-    size_t s_idx = buf_idx;
+    token_s_idx = buf_idx;
 
     if (buf_idx == 0)
         ch = ' ';
-        
+
     while (ch == ' ' || ch == '\t')
         ch = buffer[buf_idx++];
 
@@ -134,10 +212,10 @@ void get_token() {
             // 소수인 경우
             while (isdigit(ch))
                 ch = buffer[buf_idx++];
-            set_now_num_float(s_idx, buf_idx);
+            set_now_num_float(token_s_idx, buf_idx);
         } else {
             // 정수인 경우
-            set_now_num_int(s_idx, buf_idx);
+            set_now_num_int(token_s_idx, buf_idx);
         }
 
         now_token = NUMBER;
@@ -187,11 +265,29 @@ void set_now_num_float(size_t s_idx, size_t e_idx) {
     now_num.val.f = num;
 }
 
-//Todo: warning 메시지 출력 함수
+void print_warning(const CAL_STRUCT *lOp, const CAL_STRUCT *rOp) {
+    if (lOp->type == INT)
+        printf("Warning: Right Operand Implicit Contraction\n");
+    else
+        printf("Warning: Right Operand Implicit Expansion\n");
+
+    if (lOp->type == INT)
+        printf("    Left Operand: %d\n", lOp->val.i);
+    else
+        printf("    Left Operand: %f\n", lOp->val.f);
+
+    if (rOp->type == INT)
+        printf("    Right Operand: %d\n", rOp->val.i);
+    else
+        printf("    Right Operand: %f\n", rOp->val.f);
+    
+    printf("    Right Operand Index: %lu\n", token_s_idx);
+}
+
 void print_error(char *exp_val) {
     printf("Syntax Error in idx: %lu - Character: %c\n", buf_idx - 1, buffer[buf_idx - 1]);
-    printf("Now Token: %s\n", print_token[now_token]);
-    printf("Expected: < %s >\n", exp_val);
+    printf("    Now Token: %s\n", print_token[now_token]);
+    printf("    Expected: < %s >\n", exp_val);
 }
 
 void rewind_buffer() {
