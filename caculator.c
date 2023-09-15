@@ -40,6 +40,7 @@ void print_error(char *exp_val);
 // s_idx는 시작주소, e_idx는 끝 바로 이후 주소
 void set_now_num_int(size_t s_idx, size_t e_idx);
 void set_now_num_float(size_t s_idx, size_t e_idx);
+void CAL_STRUCT_expansion(CAL_STRUCT *target);
 void CAL_STRUCT_calculator(CAL_STRUCT *target, const CAL_STRUCT *source, TOKEN op);
 
 CAL_STRUCT now_num;
@@ -133,10 +134,21 @@ CAL_STRUCT factor() {
     return result;
 }
 
+void CAL_STRUCT_expansion(CAL_STRUCT *target) {
+    float val = target->val.i;
+    if (target->type == FLT)
+        return;
+    
+    target->type = FLT;
+    target->val.f = val;
+}
+
 void CAL_STRUCT_calculator(CAL_STRUCT *target, const CAL_STRUCT *source, TOKEN op) {
 
-    if (target->type != source->type)
+    if (target->type != source->type) {
         print_warning(target, source);
+        CAL_STRUCT_expansion(target);
+    }
     
     switch (op)
     {
@@ -243,10 +255,8 @@ void get_token() {
         now_token = RPAREN;
     else if (ch == '\n')
         now_token = END;
-    else {
+    else
         now_token = ERROR;
-        print_error("PLUS | MINUS | STAR | DIVIDE | NUMBER | LPAREN | RPAREN");
-    }
 
     buf_idx++;
 }
@@ -279,7 +289,7 @@ void set_now_num_float(size_t s_idx, size_t e_idx) {
 
 void print_warning(const CAL_STRUCT *lOp, const CAL_STRUCT *rOp) {
     if (lOp->type == INT)
-        printf("Warning: Right Operand Implicit Contraction\n");
+        printf("Warning: Left Operand Implicit Expansion\n");
     else
         printf("Warning: Right Operand Implicit Expansion\n");
 
@@ -298,8 +308,14 @@ void print_warning(const CAL_STRUCT *lOp, const CAL_STRUCT *rOp) {
 
 void print_error(char *exp_val) {
     printf("Syntax Error in idx: %lu - Character: %c\n", buf_idx - 1, buffer[buf_idx - 1]);
+    printf("    %s", buffer);
+    for (int i=0; i<buf_idx - 1; i++)
+        printf(" ");
+    printf("    ^\n");
     printf("    Now Token: %s\n", print_token[now_token]);
     printf("    Expected: < %s >\n", exp_val);
+    
+    exit(1);
 }
 
 void rewind_buffer() {
