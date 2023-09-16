@@ -67,7 +67,7 @@ void main() {
         get_token();
         result = expression();
         if (now_token != END)
-            print_error("END");
+            print_error("PLUS | MINUS | STAR | DIVIDE | END");
         else {
             if (result.type == INT) {
                 printf("RESULT: %i\n", result.val.i);
