@@ -308,7 +308,7 @@ void print_warning(const CAL_STRUCT *lOp, const CAL_STRUCT *rOp) {
     for (int i = 0; i < buf_idx - 1; i++) {
         if (i < lOp->s_idx)
             printf(" ");
-        else if (i >= s_point_idx && i < e_point_idx && isdigit(buffer[i]))
+        else if (i >= s_point_idx && i < e_point_idx)
             printf("x");
         else
             printf("~");
