@@ -128,7 +128,7 @@ CAL_STRUCT factor() {
         if (now_token == RPAREN)
             get_token();
         else
-            print_error("RPAREN");
+            print_error("PLUS | MINUS | STAR | DIVIDE | RPAREN");
     }
     else
         print_error("NUMBER | LPAREN");
