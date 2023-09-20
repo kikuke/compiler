@@ -67,7 +67,7 @@ void main() {
         get_token();
         result = expression();
         if (now_token != END)
-            print_error("PLUS | MINUS | STAR | DIVIDE | END");
+            print_error("END");
         else {
             if (result.type == INT) {
                 printf("RESULT: %i\n", result.val.i);
@@ -128,7 +128,7 @@ CAL_STRUCT factor() {
         if (now_token == RPAREN)
             get_token();
         else
-            print_error("PLUS | MINUS | STAR | DIVIDE | RPAREN");
+            print_error("RPAREN");
     }
     else
         print_error("NUMBER | LPAREN");
@@ -136,7 +136,7 @@ CAL_STRUCT factor() {
 }
 
 void CAL_STRUCT_expansion(CAL_STRUCT *target) {
-    float val = target->val.i;
+    const float val = target->val.i;
     if (target->type == FLT)
         return;
     
@@ -217,7 +217,7 @@ void CAL_STRUCT_calculator(CAL_STRUCT *target, const CAL_STRUCT *source, TOKEN o
 
 void get_token() {
     char ch;
-    size_t token_s_idx = buf_idx;
+    const size_t token_s_idx = buf_idx;
 
     ch = buffer[buf_idx];
     while (ch == ' ' || ch == '\t')
@@ -230,9 +230,12 @@ void get_token() {
         
         if (ch == '.') {
             // 소수인 경우
-            do
+            if (!isdigit(ch = buffer[++buf_idx]))
+                print_error("NUMBER");
+            
+            // 숫자 파싱
+            while (isdigit(ch))
                 ch = buffer[++buf_idx];
-            while (isdigit(ch));
 
             set_now_num_float(token_s_idx, buf_idx);
         } else {
@@ -265,7 +268,7 @@ void get_token() {
 void set_now_num_int(size_t s_idx, size_t e_idx) {
     int num = -1;
     char num_buf[MAX_BUFFER_SIZE] = {};
-    size_t len = e_idx - s_idx;
+    const size_t len = e_idx - s_idx;
 
     memcpy(num_buf, buffer + s_idx, len);
     num_buf[len] = '\0';
@@ -279,7 +282,7 @@ void set_now_num_int(size_t s_idx, size_t e_idx) {
 void set_now_num_float(size_t s_idx, size_t e_idx) {
     float num = -1;
     char num_buf[MAX_BUFFER_SIZE] = {};
-    size_t len = e_idx - s_idx;
+    const size_t len = e_idx - s_idx;
 
     memcpy(num_buf, buffer + s_idx, len);
     num_buf[len] = '\0';
@@ -327,9 +330,11 @@ void print_warning(const CAL_STRUCT *lOp, const CAL_STRUCT *rOp) {
 }
 
 void print_error(char *exp_val) {
-    printf("Syntax Error in idx: %lu - Character: %c\n", buf_idx - 1, buffer[buf_idx - 1]);
+    const size_t error_idx = buf_idx - 1;
+
+    printf("Syntax Error in idx: %lu - Character: %c\n", error_idx, buffer[error_idx]);
     printf("    %s", buffer);
-    for (int i=0; i<buf_idx - 1; i++)
+    for (int i=0; i<error_idx; i++)
         printf(" ");
     printf("    ^\n");
     printf("    Now Token: %s\n", print_token[now_token]);
