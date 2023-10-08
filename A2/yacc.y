@@ -171,8 +171,8 @@ abstract_declarator_opt
     ;
 
 abstract_declarator
-    | direct_abstract_declarator
-    : pointer
+    : direct_abstract_declarator
+    | pointer
     | pointer direct_abstract_declarator
     ;
 
@@ -252,6 +252,11 @@ arg_expression_list_opt
 arg_expression_list
     : assignment_expression
     | arg_expression_list COMMA assignment_expression
+    ;
+
+constant_expression_opt
+    :
+    | constant_expression
     ;
 
 constant_expression
