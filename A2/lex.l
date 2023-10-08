@@ -59,7 +59,6 @@ while		               	{return(WHILE_SYM);}
 "\*"			            {return(STAR);}
 "\/"			            {return(SLASH);}
 "\%"			            {return(PERCENT);}
-"\|"			            {return(BAR);}
 "\&"			            {return(AMP);}
 "\;"			            {return(SEMICOLON);}
 "\+"			            {return(PLUS);}

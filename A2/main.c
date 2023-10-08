@@ -2,17 +2,20 @@
 #include <stdlib.h>
 #include "y.tab.h"
 
+extern int yylineno;
+extern char *yytext;
+
 int main()
 {
     yyparse();
-    fputs("Syntax Analysis Complete!\n", stdout);
+    printf("Syntax Analysis Complete!\n");
 
     exit(0);
 }
 
 int yyerror(char *s) 
 {
-    fputs("Syntax Analysis Failed!", stderr);
+    printf("Syntax Analysis Failed!\nline: %d\ntext: %s\n", yylineno, yytext);
     exit(1);
 }
 
