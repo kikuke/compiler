@@ -2,6 +2,7 @@
 #define YYSTYPE_IS_DECLARED 1
 typedef long YYSTYPE;
 
+#include <stdio.h>
 #include "type.h"
 #include "support.h"
 
@@ -10,6 +11,7 @@ extern A_NODE *root;
 extern A_ID *current_id;
 extern int current_level;
 extern A_TYPE *int_type;
+extern char *yytext;
 %}
 
 %start program
@@ -385,3 +387,14 @@ type_name
     : declaration_specifiers abstract_declarator_opt {$$=setTypeNameSpecifier($2, $1);}
     ;
 %%
+
+int yyerror(char *s) 
+{
+    syntax_err++;
+    printf("line %d: %s near %s \n", line_no, s, yytext);
+}
+
+int yywrap()
+{
+    return 1;
+}
