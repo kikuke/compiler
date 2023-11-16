@@ -1,5 +1,5 @@
-#ifndef SUPPORT_H
-#define SUPPORT_H
+#ifndef TYPE_H
+#define TYPE_H
 
 #define NIL 0
 typedef enum {FALSE,TRUE} BOOLEAN;

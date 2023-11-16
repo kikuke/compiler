@@ -1,3 +1,6 @@
+#ifndef SUPPORT_H
+#define SUPPORT_H
+
 #include "type.h"
 
 A_NODE *makeNode(NODE_NAME, A_NODE *, A_NODE *, A_NODE *);
@@ -35,3 +38,5 @@ BOOLEAN isNotSameType(A_TYPE *, A_TYPE *);
 BOOLEAN isPointerOrArrayType(A_TYPE *);
 void syntax_error(int i, char *s);
 void initialize();
+
+#endif

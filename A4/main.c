@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "y.tab.h"
 #include "support.h"
+#include "print.h"
 
 extern int syntax_err;
 extern A_NODE *root;
