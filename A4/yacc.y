@@ -385,9 +385,3 @@ type_name
     : declaration_specifiers abstract_declarator_opt {$$=setTypeNameSpecifier($2, $1);}
     ;
 %%
-extern char *yytext;
-yyerror(char *s)
-{
-    syntax_err++;
-    printf("line %d: %s near %s \n", line_no, s, yytext);
-}

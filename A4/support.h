@@ -18,7 +18,7 @@ A_ID *linkDeclaratorList(A_ID *, A_ID *);
 A_ID *getIdentifierDeclared(char *);
 A_TYPE *getTypeOfStructOrEnumReIdentifier(T_KIND, char *, ID_KIND);
 A_ID *setDeclaratorInit(A_ID *, A_NODE *);
-A_ID *setDeclaratorKind(A_ID *, ID_KIND *);
+A_ID *setDeclaratorKind(A_ID *, ID_KIND);
 A_ID *setDeclaratorType(A_ID *, A_TYPE *);
 A_ID *setDeclaratorElementType(A_ID *, A_TYPE *);
 A_ID *setDeclaratorTypeAndKind(A_ID *, A_TYPE *, ID_KIND);

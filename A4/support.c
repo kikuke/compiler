@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "type.h"
 #include "support.h"
 #include "y.tab.h"
@@ -225,7 +226,7 @@ A_ID *setDeclaratorInit(A_ID *id, A_NODE *n) {
 }
 
 // set declarator kind
-A_ID *setDeclaratorKind(A_ID *id, ID_KIND * k) {
+A_ID *setDeclaratorKind(A_ID *id, ID_KIND k) {
     A_ID *a;
     a=searchIdentifierAtCurrentLevel(id->name, id->prev);
     if (a)

@@ -11,7 +11,7 @@ typedef long YYSTYPE;
 #include "y.tab.h"
 #include "type.h"
 
-extern int yylval;
+extern long yylval;
 extern int line_no;
 extern A_ID *current_id;
 char        *makeString();
@@ -85,7 +85,7 @@ char *makeString(char *s) {
     strcpy(t,s);
     return(t);
 }
-int checkIdentifier(chr *s) {
+int checkIdentifier(char *s) {
     A_ID *id;
     char *t;
     id=current_id;
