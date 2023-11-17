@@ -1,5 +1,5 @@
 a.out: y.tab.o lex.yy.o print.o support.o main.o
-	cc -o $@ $^
+	cc -g -o $@ $^
 
 clean:
 	rm lex.yy.c
@@ -16,16 +16,16 @@ lex.yy.c: lex.l
 	lex lex.l
 
 print.o: print.c
-	cc -c $^
+	cc -g -c $^
 
 support.o: support.c
-	cc -c $^
+	cc -g -c $^
 
 y.tab.o: y.tab.c
-	cc -c $^
+	cc -g -c $^
 
 lex.yy.o: lex.yy.c
-	cc -c $^
+	cc -g -c $^
 
 main.o: main.c
-	cc -c $^
+	cc -g -c $^
