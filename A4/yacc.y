@@ -163,13 +163,13 @@ parameter_type_list_opt
     ;
 
 parameter_type_list
-    : parameter_list {$$=$1;}
-    | parameter_list COMMA DOTDOTDOT {$$=linkDeclaratorList($1, setDeclaratorKind(makeDummyIdentifier(), ID_PARM));}
+    : parameter_list {checkVoidParamName($1); $$=$1;}
+    | parameter_list COMMA DOTDOTDOT {checkVoidParam($1); $$=linkDeclaratorList($1, setDeclaratorKind(makeDummyIdentifier(), ID_PARM));}
     ;
 
 parameter_list
     : parameter_declaration {$$=$1;}
-    | parameter_list COMMA parameter_declaration {$$=linkDeclaratorList($1, $3);}
+    | parameter_list COMMA parameter_declaration {checkVoidParam($1); $$=linkDeclaratorList($1, $3);}
     ;
 
 parameter_declaration

@@ -36,6 +36,8 @@ A_TYPE *setTypeStructOrEnumIdentifier(T_KIND, char *, ID_KIND);
 BOOLEAN isNotSameFormalParameters(A_ID *, A_ID *);
 BOOLEAN isNotSameType(A_TYPE *, A_TYPE *);
 BOOLEAN isPointerOrArrayType(A_TYPE *);
+void checkVoidParamName(A_ID *);
+void checkVoidParam(A_ID *);
 void syntax_error(int i, char *s);
 void initialize();
 
