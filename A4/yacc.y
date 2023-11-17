@@ -35,7 +35,6 @@ external_declaration
 
 function_definition
     : declaration_specifiers declarator {$$ = setFunctionDeclaratorSpecifier($2, $1);} compound_statement {$$ = setFunctionDeclaratorBody($3, $4);}
-    | declarator {$$ = setFunctionDeclaratorSpecifier($1, makeSpecifier(int_type, 0));} compound_statement {$$ = setFunctionDeclaratorBody($2, $3);}
     ;
 
 declaration_list_opt
@@ -185,8 +184,8 @@ abstract_declarator_opt
 
 abstract_declarator
     : direct_abstract_declarator {$$=$1;}
-    | pointer {$$=makeType(T_POINTER);}
-    | pointer direct_abstract_declarator {$$=setTypeElementType($2, makeType(T_POINTER));}
+    | pointer {$$=$1;} // 수정
+    | pointer direct_abstract_declarator {$$=setTypeElementType($2, $1);} // 수정
     ;
 
 direct_abstract_declarator

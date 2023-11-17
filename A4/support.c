@@ -327,17 +327,41 @@ A_ID *setDeclaratorListSpecifier(A_ID *id, A_SPECIFIER *p) {
     return (id);
 }
 
+// void가 param에서 쓰인다면 오직 하나만 존재해야함
+BOOLEAN checkVoidParam(A_ID *id) {
+    BOOLEAN hasVoid=FALSE;
+    int parm_count = 0;
+
+    while (id) {
+        if (id->level < current_level)
+            break;
+        parm_count++;
+        if (id->type == void_type) {
+            if (id->name != "")
+                return (TRUE);
+
+            hasVoid = TRUE;
+        }
+        if (parm_count > 1 && hasVoid)
+            return (TRUE);
+        id = id->prev;
+    }
+    return (FALSE);
+}
+
 // set declarator_list type and kind
 A_ID *setParameterDeclaratorSpecifier(A_ID *id, A_SPECIFIER *p) {
     // check redeclaration
     if (searchIdentifierAtCurrentLevel(id->name, id->prev))
         syntax_error(12, id->name);
     // check parameter storage class && void type
-    if (p->stor || p->type==void_type)
+    if (p->stor)
         syntax_error(14, NULL);
     setDefaultSpecifier(p);
     id=setDeclaratorElementType(id, p->type);
     id->kind=ID_PARM;
+    if (checkVoidParam(id))
+        syntax_error(14, id->name);
     return (id);
 }
 
