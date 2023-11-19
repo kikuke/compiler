@@ -293,8 +293,11 @@ A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *p) {
     while (a) {
         if (strlen(a->name))
             current_id = a;
-        else if (a->type)
-            syntax_error(23, NULL);
+        else if (a->type) {
+            if (a->type == void_type && a->link == NIL);
+            else
+                syntax_error(23, NULL);
+        }
         a = a->link;
     }
     return (id);
