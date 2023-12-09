@@ -624,7 +624,7 @@ int sem_statement(A_NODE* node, int addr, A_TYPE* ret, BOOLEAN sw, BOOLEAN brk, 
                 semantic_error(73, node->line,"");
             break;
         case N_STMT_RETURN :
-            if (node->clink) // Todo: 수식이 나올때는 체크를 하지만 if else에 걸릴대 c link가 없을때 void 타입해야함 ret값이 void인지만
+            if (node->clink)
             {
                 t=sem_expression(node->clink);
                 if (isAllowableCastingConversion(ret, t))
