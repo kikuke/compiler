@@ -1,0 +1,329 @@
+Terminals unused in grammar
+
+    CHAR
+
+
+문법
+
+    0 $accept: program $end
+
+    1 program: command_list
+
+    2 command_list: command
+    3             | command_list command
+
+    4 command: NEW_LINE
+    5        | IDENTIFIER COLON NEW_LINE
+    6        | INST1 INTEGER COMMA INTEGER NEW_LINE
+    7        | INST2 INTEGER COMMA IDENTIFIER NEW_LINE
+    8        | directive INTEGER INTEGER NEW_LINE
+    9        | directive INTEGER FLOAT NEW_LINE
+   10        | directive INTEGER STRING NEW_LINE
+   11        | GLOBAL_BYTE_SYM INTEGER INTEGER NEW_LINE
+
+   12 directive: GLOBAL_WORD_SYM
+   13          | LITERAL_SYM
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    NEW_LINE (258) 4 5 6 7 8 9 10 11
+    COLON (259) 5
+    COMMA (260) 6 7
+    IDENTIFIER (261) 5 7
+    INST1 (262) 6
+    INST2 (263) 7
+    INTEGER (264) 6 7 8 9 10 11
+    FLOAT (265) 9
+    STRING (266) 10
+    CHAR (267)
+    GLOBAL_WORD_SYM (268) 12
+    GLOBAL_BYTE_SYM (269) 11
+    LITERAL_SYM (270) 13
+
+
+Nonterminals, with rules where they appear
+
+    $accept (16)
+        on left: 0
+    program (17)
+        on left: 1
+        on right: 0
+    command_list (18)
+        on left: 2 3
+        on right: 1 3
+    command (19)
+        on left: 4 5 6 7 8 9 10 11
+        on right: 2 3
+    directive (20)
+        on left: 12 13
+        on right: 8 9 10
+
+
+State 0
+
+    0 $accept: • program $end
+
+    NEW_LINE         shift, and go to state 1
+    IDENTIFIER       shift, and go to state 2
+    INST1            shift, and go to state 3
+    INST2            shift, and go to state 4
+    GLOBAL_WORD_SYM  shift, and go to state 5
+    GLOBAL_BYTE_SYM  shift, and go to state 6
+    LITERAL_SYM      shift, and go to state 7
+
+    program       go to state 8
+    command_list  go to state 9
+    command       go to state 10
+    directive     go to state 11
+
+
+State 1
+
+    4 command: NEW_LINE •
+
+    $default  reduce using rule 4 (command)
+
+
+State 2
+
+    5 command: IDENTIFIER • COLON NEW_LINE
+
+    COLON  shift, and go to state 12
+
+
+State 3
+
+    6 command: INST1 • INTEGER COMMA INTEGER NEW_LINE
+
+    INTEGER  shift, and go to state 13
+
+
+State 4
+
+    7 command: INST2 • INTEGER COMMA IDENTIFIER NEW_LINE
+
+    INTEGER  shift, and go to state 14
+
+
+State 5
+
+   12 directive: GLOBAL_WORD_SYM •
+
+    $default  reduce using rule 12 (directive)
+
+
+State 6
+
+   11 command: GLOBAL_BYTE_SYM • INTEGER INTEGER NEW_LINE
+
+    INTEGER  shift, and go to state 15
+
+
+State 7
+
+   13 directive: LITERAL_SYM •
+
+    $default  reduce using rule 13 (directive)
+
+
+State 8
+
+    0 $accept: program • $end
+
+    $end  shift, and go to state 16
+
+
+State 9
+
+    1 program: command_list •
+    3 command_list: command_list • command
+
+    NEW_LINE         shift, and go to state 1
+    IDENTIFIER       shift, and go to state 2
+    INST1            shift, and go to state 3
+    INST2            shift, and go to state 4
+    GLOBAL_WORD_SYM  shift, and go to state 5
+    GLOBAL_BYTE_SYM  shift, and go to state 6
+    LITERAL_SYM      shift, and go to state 7
+
+    $default  reduce using rule 1 (program)
+
+    command    go to state 17
+    directive  go to state 11
+
+
+State 10
+
+    2 command_list: command •
+
+    $default  reduce using rule 2 (command_list)
+
+
+State 11
+
+    8 command: directive • INTEGER INTEGER NEW_LINE
+    9        | directive • INTEGER FLOAT NEW_LINE
+   10        | directive • INTEGER STRING NEW_LINE
+
+    INTEGER  shift, and go to state 18
+
+
+State 12
+
+    5 command: IDENTIFIER COLON • NEW_LINE
+
+    NEW_LINE  shift, and go to state 19
+
+
+State 13
+
+    6 command: INST1 INTEGER • COMMA INTEGER NEW_LINE
+
+    COMMA  shift, and go to state 20
+
+
+State 14
+
+    7 command: INST2 INTEGER • COMMA IDENTIFIER NEW_LINE
+
+    COMMA  shift, and go to state 21
+
+
+State 15
+
+   11 command: GLOBAL_BYTE_SYM INTEGER • INTEGER NEW_LINE
+
+    INTEGER  shift, and go to state 22
+
+
+State 16
+
+    0 $accept: program $end •
+
+    $default  accept
+
+
+State 17
+
+    3 command_list: command_list command •
+
+    $default  reduce using rule 3 (command_list)
+
+
+State 18
+
+    8 command: directive INTEGER • INTEGER NEW_LINE
+    9        | directive INTEGER • FLOAT NEW_LINE
+   10        | directive INTEGER • STRING NEW_LINE
+
+    INTEGER  shift, and go to state 23
+    FLOAT    shift, and go to state 24
+    STRING   shift, and go to state 25
+
+
+State 19
+
+    5 command: IDENTIFIER COLON NEW_LINE •
+
+    $default  reduce using rule 5 (command)
+
+
+State 20
+
+    6 command: INST1 INTEGER COMMA • INTEGER NEW_LINE
+
+    INTEGER  shift, and go to state 26
+
+
+State 21
+
+    7 command: INST2 INTEGER COMMA • IDENTIFIER NEW_LINE
+
+    IDENTIFIER  shift, and go to state 27
+
+
+State 22
+
+   11 command: GLOBAL_BYTE_SYM INTEGER INTEGER • NEW_LINE
+
+    NEW_LINE  shift, and go to state 28
+
+
+State 23
+
+    8 command: directive INTEGER INTEGER • NEW_LINE
+
+    NEW_LINE  shift, and go to state 29
+
+
+State 24
+
+    9 command: directive INTEGER FLOAT • NEW_LINE
+
+    NEW_LINE  shift, and go to state 30
+
+
+State 25
+
+   10 command: directive INTEGER STRING • NEW_LINE
+
+    NEW_LINE  shift, and go to state 31
+
+
+State 26
+
+    6 command: INST1 INTEGER COMMA INTEGER • NEW_LINE
+
+    NEW_LINE  shift, and go to state 32
+
+
+State 27
+
+    7 command: INST2 INTEGER COMMA IDENTIFIER • NEW_LINE
+
+    NEW_LINE  shift, and go to state 33
+
+
+State 28
+
+   11 command: GLOBAL_BYTE_SYM INTEGER INTEGER NEW_LINE •
+
+    $default  reduce using rule 11 (command)
+
+
+State 29
+
+    8 command: directive INTEGER INTEGER NEW_LINE •
+
+    $default  reduce using rule 8 (command)
+
+
+State 30
+
+    9 command: directive INTEGER FLOAT NEW_LINE •
+
+    $default  reduce using rule 9 (command)
+
+
+State 31
+
+   10 command: directive INTEGER STRING NEW_LINE •
+
+    $default  reduce using rule 10 (command)
+
+
+State 32
+
+    6 command: INST1 INTEGER COMMA INTEGER NEW_LINE •
+
+    $default  reduce using rule 6 (command)
+
+
+State 33
+
+    7 command: INST2 INTEGER COMMA IDENTIFIER NEW_LINE •
+
+    $default  reduce using rule 7 (command)
