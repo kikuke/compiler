@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <string.h>
+#ifndef CODE_GEN_H
+#define CODE_GEN_H
 #include "type.h"
 
 typedef enum op{
@@ -51,3 +51,5 @@ void gen_label_number(int);
 void gen_label_name(char *);
 void gen_error(int, int, char *);
 int get_label();
+
+#endif

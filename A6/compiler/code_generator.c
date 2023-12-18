@@ -1,4 +1,12 @@
+#include <stdio.h>
+#include <string.h>
+
 #include "code_generator.h"
+
+extern FILE *fout;
+extern A_TYPE *int_type, *float_type, *char_type, *void_type, *string_type;
+extern A_LITERAL literal_table[];
+extern int literal_no;
 
 char *opcode_name[] = {
     "OP_NULL",
@@ -68,10 +76,6 @@ char *opcode_name[] = {
 
 int label_no = 0;
 int gen_err = 0;
-extern FILE *fout;
-extern A_TYPE *int_type, *float_type, *char_type, *void_type, *string_type;
-extern A_LITERAL literal_table[];
-extern int literal_no;
 
 void code_generation(A_NODE *node)
 {
@@ -82,8 +86,7 @@ void code_generation(A_NODE *node)
 void gen_literal_table()
 {
     int i;
-    for (i = 1; i <= literal_no; i++)
-    {
+    for (i = 1; i <= literal_no; i++) {
         fprintf(fout, ".literal %5d ", literal_table[i].addr);
 
         if (literal_table[i].type == int_type)
@@ -98,8 +101,7 @@ void gen_literal_table()
 }
 void gen_program(A_NODE *node)
 {
-    switch (node->name)
-    {
+    switch (node->name) {
     case N_PROGRAM:
         gen_code_i(INT, 0, node->value);
         gen_code_s(SUP, 0, "main");
@@ -118,17 +120,14 @@ void gen_expression(A_NODE *node)
     A_TYPE *t;
     int i, ll;
 
-    switch (node->name)
-    {
+    switch (node->name) {
     case N_EXP_IDENT:
         id = node->clink;
         t = id->type;
-        switch (id->kind)
-        {
+        switch (id->kind) {
         case ID_VAR:
         case ID_PARM:
-            switch (t->kind)
-            {
+            switch (t->kind) {
             case T_ENUM:
             case T_POINTER:
                 gen_code_i(LOD, id->level, id->address);
@@ -143,19 +142,19 @@ void gen_expression(A_NODE *node)
 
             case T_STRUCT:
             case T_UNION:
-                gen_error(999, id->line, "Struct and Union");
-                // gen_code_i(LDA, id->level, id->address);
-                // i = id->type->size;
-                // gen_code_i(LDI, 0, i % 4 ? i / 4 + 1 : i / 4);
+                gen_error(999, id->line, "STRUCT_OR_UNION");
                 break;
+
             default:
                 gen_error(11, id->line, 0);
                 break;
             }
             break;
+
         case ID_ENUM_LITERAL:
             gen_code_i(LITI, 0, id->init);
             break;
+
         default:
             gen_error(11, id->line, 0);
             break;
@@ -183,18 +182,16 @@ void gen_expression(A_NODE *node)
     case N_EXP_ARRAY:
         gen_expression(node->llink);
         gen_expression(node->rlink);
-        //gen_code_i(CHK, 0, node->llink->type->expr);
+        // gen_code_i(CHK, 0, node->llink->type->expr);
 
-        if (node->type->size > 1)
-        {
+        if (node->type->size > 1) {
             gen_code_i(LITI, 0, node->type->size);
             gen_code_i(MULI, 0, 0);
         }
 
         gen_code_i(OFFSET, 0, 0);
 
-        if (!isArrayType(node->type))
-        {
+        if (!isArrayType(node->type)) {
             i = node->type->size;
             if (i == 1)
                 gen_code_i(LDIB, 0, 0);
@@ -209,8 +206,7 @@ void gen_expression(A_NODE *node)
         if (i % 4)
             i = i / 4 * 4 + 4;
 
-        if (node->rlink)
-        {
+        if (node->rlink) {
             gen_code_i(INT, 0, 12 + i);
             gen_arg_expression(node->rlink);
             gen_code_i(POP, 0, node->rlink->value / 4 + 3);
@@ -223,43 +219,11 @@ void gen_expression(A_NODE *node)
         break;
 
     case N_EXP_STRUCT:
-        gen_error(999, id->line, "Struct");
-        // gen_expression_left(node->llink);
-        // id = node->rlink;
-
-        // if (id->address > 0)
-        // {
-        //     gen_code_i(LITI, 0, id->address);
-        //     gen_code_i(OFFSET, 0, 0);
-        // }
-
-        // if (!isArrayType(node->type))
-        // {
-        //     i = node->type->size;
-        //     if (i == 1)
-        //         gen_code_i(LDIB, 0, 0);
-        //     else
-        //         gen_code_i(LDI, 0, i % 4 ? i / 4 + 1 : i / 4);
-        // }
+        gen_error(999, id->line, "N_EXP_STURCT");
         break;
 
     case N_EXP_ARROW:
-        gen_error(999, id->line, "Arrow");
-        // gen_expression(node->llink);
-        // id = node->rlink;
-        // if (id->address > 0)
-        // {
-        //     gen_code_i(LITI, 0, id->address);
-        //     gen_code_i(OFFSET, 0, 0);
-        // }
-        // if (!isArrayType(node->type))
-        // {
-        //     i = node->type->size;
-        //     if (i == 1)
-        //         gen_code_i(LDIB, 0, 0);
-        //     else
-        //         gen_code_i(LDI, 0, i % 4 ? i / 4 + 1 : i / 4);
-        // }
+        gen_error(999, id->line, "N_EXP_ARROW");
         break;
 
     case N_EXP_POST_INC:
@@ -272,8 +236,7 @@ void gen_expression(A_NODE *node)
         else
             gen_code_i(LDX, 0, 1);
 
-        if (isPointerOrArrayType(node->type))
-        {
+        if (isPointerOrArrayType(node->type)) {
             gen_code_i(LITI, 0, node->type->element_type->size);
             gen_code_i(ADDI, 0, 0);
         }
@@ -298,8 +261,7 @@ void gen_expression(A_NODE *node)
         else
             gen_code_i(LDX, 0, 1);
 
-        if (isPointerOrArrayType(node->type))
-        {
+        if (isPointerOrArrayType(node->type)) {
             gen_code_i(LITI, 0, node->type->element_type->size);
             gen_code_i(SUBI, 0, 0);
         }
@@ -324,8 +286,7 @@ void gen_expression(A_NODE *node)
         else
             gen_code_i(LDX, 0, 1);
 
-        if (isPointerOrArrayType(node->type))
-        {
+        if (isPointerOrArrayType(node->type)) {
             gen_code_i(LITI, 0, node->type->element_type->size);
             gen_code_i(ADDI, 0, 0);
         }
@@ -350,8 +311,7 @@ void gen_expression(A_NODE *node)
         else
             gen_code_i(LDX, 0, 1);
 
-        if (isPointerOrArrayType(node->type))
-        {
+        if (isPointerOrArrayType(node->type)) {
             gen_code_i(LITI, 0, node->type->element_type->size);
             gen_code_i(SUBI, 0, 0);
         }
@@ -442,16 +402,14 @@ void gen_expression(A_NODE *node)
 
     case N_EXP_ADD:
         gen_expression(node->llink);
-        if (isPointerOrArrayType(node->rlink->type))
-        {
+        if (isPointerOrArrayType(node->rlink->type)) {
             gen_code_i(LITI, 0, node->rlink->type->element_type->size);
             gen_code_i(MULI, 0, 0);
         }
 
         gen_expression(node->rlink);
 
-        if (isPointerOrArrayType(node->llink->type))
-        {
+        if (isPointerOrArrayType(node->llink->type)) {
             gen_code_i(LITI, 0, node->llink->type->element_type->size);
             gen_code_i(MULI, 0, 0);
         }
@@ -466,8 +424,7 @@ void gen_expression(A_NODE *node)
         gen_expression(node->llink);
         gen_expression(node->rlink);
 
-        if (isPointerOrArrayType(node->llink->type) && !isPointerOrArrayType(node->rlink->type))
-        {
+        if (isPointerOrArrayType(node->llink->type) && !isPointerOrArrayType(node->rlink->type)) {
             gen_code_i(LITI, 0, node->llink->type->element_type->size);
             gen_code_i(MULI, 0, 0);
         }
@@ -575,31 +532,31 @@ void gen_expression_left(A_NODE *node)
     A_TYPE *t;
     int result;
 
-    switch (node->name)
-    {
+    switch (node->name) {
     case N_EXP_IDENT:
         id = node->clink;
         t = id->type;
-        switch (id->kind)
-        {
+        switch (id->kind) {
         case ID_VAR:
         case ID_PARM:
-            switch (t->kind)
-            {
+            switch (t->kind) {
             case T_ENUM:
             case T_POINTER:
                 gen_code_i(LDA, id->level, id->address);
                 break;
+
             case T_STRUCT:
             case T_UNION:
                 gen_error(999, id->line, "Struct and Union");
                 break;
+
             case T_ARRAY:
                 if (id->kind == ID_VAR)
                     gen_code_i(LDA, id->level, id->address);
                 else
                     gen_code_i(LOD, id->level, id->address);
                 break;
+
             default:
                 gen_error(13, node->line, id->name);
                 break;
@@ -618,35 +575,25 @@ void gen_expression_left(A_NODE *node)
         gen_expression(node->llink);
         gen_expression(node->rlink);
         // gen_code_i(CHK, 0, node->llink->type->expr);
-        if (node->type->size > 1)
-        {
+        if (node->type->size > 1) {
             gen_code_i(LITI, 0, node->type->size);
             gen_code_i(MULI, 0, 0);
         }
         gen_code_i(OFFSET, 0, 0);
         break;
+
     case N_EXP_STRUCT:
-        // gen_expression_left(node->llink);
-        // id = node->rlink;
-        // if (id->address > 0)
-        // {
-        //     gen_code_i(LITI, 0, id->address);
-        //     gen_code_i(OFFSET, 0, 0);
-        // }
-        // break;
-    case N_EXP_ARROW:
-        gen_error(999, id->line, "Struct and Arrow");
-        // gen_expression_left(node->llink);
-        // id = node->rlink;
-        // if (id->address > 0)
-        // {
-        //     gen_code_i(LITI, 0, id->address);
-        //     gen_code_i(OFFSET, 0, 0);
-        // }
+        gen_error(999, id->line, "N_EXP_STURCT");
         break;
+
+    case N_EXP_ARROW:
+        gen_error(999, id->line, "N_EXP_ARROW");
+        break;
+
     case N_EXP_STAR:
         gen_expression(node->clink);
         break;
+
     case N_EXP_INT_CONST:
     case N_EXP_FLOAT_CONST:
     case N_EXP_CHAR_CONST:
@@ -678,6 +625,7 @@ void gen_expression_left(A_NODE *node)
     case N_EXP_ASSIGN:
         gen_error(12, node->line, 0);
         break;
+
     default:
         gen_error(100, node->line, 0);
         break;
@@ -687,12 +635,13 @@ void gen_expression_left(A_NODE *node)
 void gen_arg_expression(A_NODE *node)
 {
     A_NODE *n;
-    switch (node->name)
-    {
+
+    switch (node->name) {
     case N_ARG_LIST:
         gen_expression(node->llink);
         gen_arg_expression(node->rlink);
         break;
+
     case N_ARG_LIST_NIL:
         break;
 
@@ -714,40 +663,19 @@ void gen_statement(A_NODE *node, int cont_label, int break_label, A_SWITCH sw[],
     int switch_no = 0;
     A_NODE *n;
     int i, l1, l2, l3;
-    switch (node->name)
-    {
-    case N_STMT_LABEL_CASE:
-        // if (sw)
-        // {
-        //     *sn = *sn + 1;
-        //     sw[*sn].kind = SW_VALUE;
-        //     sw[*sn].val = node->llink;
-        //     sw[*sn].label = l1 = get_label();
-        //     gen_label_number(l1);
-        // }
 
-        // else
-        //     gen_error(21, node->line, 0);
-        // break;
+    switch (node->name) {
+    case N_STMT_LABEL_CASE:
+        gen_error(999, node->line, "N_STMT_LABEL_CASE");
+        break;
+
     case N_STMT_LABEL_DEFAULT:
-        gen_error(999, node->line, "case and default Label");
-        // if (sw)
-        // {
-        //     *sn = *sn + 1;
-        //     sw[*sn].kind = SW_DEFAULT;
-        //     sw[*sn].val = node->llink;
-        //     sw[*sn].label = l1 = get_label();
-        //     gen_label_number(l1);
-        // }
-        // else
-        //     gen_error(20, node->line, 0);
-        // gen_statement(node->clink, cont_label, break_label, sw, sn);
+        gen_error(999, node->line, "N_STMT_LABEL_DEFAULT");
         break;
 
     case N_STMT_COMPOUND:
         if (node->llink)
             gen_declaration_list(node->llink);
-
         gen_statement_list(node->rlink, cont_label, break_label, sw, sn);
         break;
 
@@ -780,25 +708,7 @@ void gen_statement(A_NODE *node, int cont_label, int break_label, A_SWITCH sw[],
         break;
 
     case N_STMT_SWITCH:
-        gen_error(999, node->line, "Switch");
-        // gen_expression(node->llink);
-        // gen_code_l(SWITCH, 0, l1 = get_label());
-        // gen_code_l(JMP, 0, l2 = get_label());
-        // gen_statement(node->rlink, cont_label, l2, switch_table, &switch_no);
-        // gen_label_number(l1);
-
-        // for (i = 1; i <= switch_no; i++)
-        // {
-        //     if (switch_table[i].kind == SW_VALUE)
-        //         gen_code_i(SWVALUE, 0, switch_table[i].val);
-
-        //     else
-        //         gen_code_i(SWDEFAULT, 0, 0);
-
-        //     gen_code_l(SWLABEL, 0, switch_table[i].label);
-        // }
-        // gen_code_i(SWEND, 0, 0);
-        // gen_label_number(l2);
+        gen_error(999, node->line, "N_STMT_SWITCH");
         break;
 
     case N_STMT_WHILE:
@@ -826,8 +736,7 @@ void gen_statement(A_NODE *node, int cont_label, int break_label, A_SWITCH sw[],
     case N_STMT_FOR:
         n = node->llink;
         l3 = get_label();
-        if (n->llink)
-        {
+        if (n->llink) {
             gen_expression(n->llink);
             i = n->llink->type->size;
             if (i)
@@ -836,8 +745,7 @@ void gen_statement(A_NODE *node, int cont_label, int break_label, A_SWITCH sw[],
 
         gen_label_number(l1 = get_label());
         l2 = get_label();
-        if (n->clink)
-        {
+        if (n->clink) {
             gen_expression(n->clink);
             gen_code_l(JPC, 0, l2);
         }
@@ -845,8 +753,7 @@ void gen_statement(A_NODE *node, int cont_label, int break_label, A_SWITCH sw[],
         gen_statement(node->rlink, l3, l2, 0, 0);
         gen_label_number(l3);
 
-        if (n->rlink)
-        { //a
+        if (n->rlink) {
             gen_expression(n->rlink);
             i = n->rlink->type->size;
             if (i)
@@ -874,8 +781,7 @@ void gen_statement(A_NODE *node, int cont_label, int break_label, A_SWITCH sw[],
 
     case N_STMT_RETURN:
         n = node->clink;
-        if (n)
-        {
+        if (n) {
             i = n->type->size;
             if (i % 4)
                 i = i / 4 * 4 + 4;
@@ -883,9 +789,9 @@ void gen_statement(A_NODE *node, int cont_label, int break_label, A_SWITCH sw[],
             gen_expression(n);
             gen_code_i(STO, 0, i / 4);
         }
-
         gen_code_i(RET, 0, 0);
         break;
+
     default:
         gen_error(100, node->line, 0);
         break;
@@ -894,8 +800,7 @@ void gen_statement(A_NODE *node, int cont_label, int break_label, A_SWITCH sw[],
 
 void gen_statement_list(A_NODE *node, int cont_label, int break_lable, A_SWITCH sw[], int *sn)
 {
-    switch (node->name)
-    {
+    switch (node->name) {
     case N_STMT_LIST:
         gen_statement(node->llink, cont_label, break_lable, sw, sn);
         gen_statement_list(node->rlink, cont_label, break_lable, sw, sn);
@@ -909,20 +814,13 @@ void gen_statement_list(A_NODE *node, int cont_label, int break_lable, A_SWITCH 
     }
 }
 
-void gen_initializer_global(A_NODE *node, A_TYPE *t, int addr)
-{
-    ;
-}
+void gen_initializer_global(A_NODE *node, A_TYPE *t, int addr) {}
 
-void gen_initializer_local(A_NODE *node, A_TYPE *t, int addr)
-{
-    ;
-}
+void gen_initializer_local(A_NODE *node, A_TYPE *t, int addr) {}
 
 void gen_declaration_list(A_ID *id)
 {
-    while (id)
-    {
+    while (id) {
         gen_declaration(id);
         id = id->link;
     }
@@ -935,12 +833,7 @@ void gen_declaration(A_ID *id)
     switch (id->kind)
     {
     case ID_VAR:
-        // if (id->init)
-        //     if (id->level == 0)
-        //         gen_initializer_global(id->init, id->type, id->address);
-
-        //     else
-        //         gen_initializer_local(id->init, id->type, id->address);
+        gen_error(999, id->line, "INITIALIZER");
         break;
 
     case ID_FUNC:
@@ -953,13 +846,14 @@ void gen_declaration(A_ID *id)
             break;
         }
 
-    case ID_STRUCT:
-    case ID_FIELD:
-        gen_error(999, id->line, "Struct and Field");
-        break;
     case ID_PARM:
     case ID_TYPE:
     case ID_ENUM:
+    case ID_STRUCT:
+        gen_error(999, id->line, "ID_STRUCT");
+    case ID_FIELD:
+        gen_error(999, id->line, "ID_FIELD");
+        break;
     case ID_ENUM_LITERAL:
     case ID_NULL:
         break;
