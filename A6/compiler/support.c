@@ -485,7 +485,7 @@ void initialize() {
     float_type->size = 4; float_type->check = TRUE;
     char_type->size = 1; char_type->check = TRUE;
     void_type->size = 0; void_type->check = TRUE;
-    string_type->size = 8; string_type->check = TRUE;
+    string_type->size = 4; string_type->check = TRUE;
     // printf(char *, ...) library function
     setDeclaratorTypeAndKind(makeIdentifier("printf"),
         setTypeField(
