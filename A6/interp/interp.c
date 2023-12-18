@@ -187,7 +187,7 @@ void interp()
 		default: runtime_error(100,p);
 			break;
  	    	}
-   } while (p); 
+   } while (p >0); 
 	
    printf("end execution\n");
    

@@ -833,7 +833,12 @@ void gen_declaration(A_ID *id)
     switch (id->kind)
     {
     case ID_VAR:
-        gen_error(999, id->line, "INITIALIZER");
+        if (id->init)
+            if (id->level == 0)
+                gen_initializer_global(id->init, id->type, id->address);
+
+            else
+                gen_initializer_local(id->init, id->type, id->address);
         break;
 
     case ID_FUNC:
